@@ -32,10 +32,10 @@ def opPlan(zapac, potreb, matrix):
     functionValue = 0
     while ((i < m) and (j < n)):  # повторяем цикл до сходимости метода
         transported = min(zapac[i], potreb[j])  #берем минимальное значение из Потребностей/Запасов
-        functionValue += matrix[i, j] * min(zapac[i], potreb[j])  # записываем в итоговую функцию элемент трат
+        functionValue += matrix[i][j] * min(zapac[i], potreb[j])  # записываем в итоговую функцию элемент трат
         zapac[i] -= transported  #
         potreb[j] -= transported  # обновляем векторы a и b
-        oporPlan[i, j] = transported  # добавляем элемент transported в матрицу oporPlan
+        oporPlan[i][j] = transported  # добавляем элемент transported в матрицу oporPlan
 
         if zapac[i] > potreb[j]:  # делаем сдвиги при выполнении условий
             j += 1
@@ -44,8 +44,26 @@ def opPlan(zapac, potreb, matrix):
         else:
             i += 1
             j += 1
-    return oporPlan
+    print(oporPlan)
+    print(functionValue)
+    assessmentMatrix(zapac, potreb, matrix, oporPlan)
 
+def assessmentMatrix(zapac, potreb, matrix, oporPlan):
+    Ui, Vj = np.zeros(len(zapac)), np.zeros(len(potreb))
+
+    for i in range(len(zapac)):
+        for j in range(len(potreb)):
+            if oporPlan[i, j] != 0:  # если элемент матрицы x не равен 0, расчитываем для данных индексов векторы Ui и Vj
+                if Vj[j] != 0:
+                    Ui[i] = matrix[i, j] - Vj[j]
+                else:
+                    Vj[j] = matrix[i, j] - Ui[i]
+
+    delta = np.zeros((len(zapac), len(potreb)))
+    for i in range(len(zapac)):
+        for j in range(len(potreb)):
+            delta[i, j] = Ui[i] + Vj[j] - matrix[i, j]  # расчитываем элемент дельта матрицы
+    print(delta)
 
 
 #----------------------------------------------Меню------------------------------------------------------
